@@ -13,8 +13,8 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./output_images/1-calib.png "Undistorted"
-[image2]: ./output_images/2-undistort.png "Road Transformed"
+[image1]: ./output_images/1-calib.PNG "Undistorted"
+[image2]: ./output_images/2-undistort.PNG "Road Transformed"
 [image3]: ./output_images/threshold_x.png "Binary Example"
 [image4]: ./output_images/threshold_color.png "Warp Example"
 [image5]: ./examples/straight_lines1.png
