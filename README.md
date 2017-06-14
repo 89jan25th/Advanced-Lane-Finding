@@ -90,19 +90,21 @@ My perspective transform function('def perspectivetransform(img, topdown)') is a
 
 The point for source and destination is calculated like this:
 
->    offset=[150,0]  
->    corners = np.float32([[190,720],[589,457],[698,457],[1145,720]])
->    src = np.float32([corners[0], corners[1], corners[2], corners[3]])  
->    dst = np.float32([corners[0] + offset, [corners[0,0],0] + offset, [corners[3,0],0] - offset, corners[3] - offset])  
+>    offset=[50,0]
+>    corners = np.float32([[190,720],[590,450],[700,450],[1090,720]]) # bottom-left, top-left, top-right, bottom-right ([x,y])
+>    new_top_left=np.array([corners[0,0],0])
+>    new_top_right=np.array([corners[3,0],0])    
+>    src = np.float32([corners[0], corners[1], corners[2], corners[3]])
+>    dst = np.float32([corners[0] + offset, new_top_left, new_top_right, corners[3] - offset])
 
 This resulted in the following source and destination points:  
 
 | Source        | Destination   | 
 |:-------------:|:-------------:| 
-| 589, 457      | 340, 0       | 
-| 190, 720      | 340, 720      |
-| 1145, 720     | 995, 720      |
-| 698, 457      | 995, 0        |
+| 190, 720      | 240, 720      | 
+| 590, 450      | 190, 0        |
+| 700, 450      | 1090, 0       |
+| 1090, 720     | 1040, 720     |
 
 The result birdview image is at bottom left in each cell of the 'table 2'. There is seemingly no abnormality at the result.
 
@@ -122,8 +124,13 @@ As you can see, there is anomaly in the result of 'test1.jpg.' I expect it is be
 
 The function for the radius curvature is next to the lane detection function, and also from the course.
 
-In order to find the position with respect to center, I set its center to 640 and multiply the lane position with 3.7/600, which is the ratio of meter to pixel.
+In order to find the position with respect to center, I used the following formular (from the project review)  
+> lane_center = (right_line_base_position + left_line_base_position) / 2  
+> car_center = image_width / 2  
+> off_center_px = lane_center - car_center  
+> off_center_meters = off_center_px * x_scale_factor  
 
+And here's the implementation.  
 > ym_per_pix = 30/720 # meters per pixel in y dimension  
 > xm_per_pix = 3.7/700 # meters per pixel in x dimension  
 > y_eval = warped.shape[0]  
@@ -131,9 +138,9 @@ In order to find the position with respect to center, I set its center to 640 an
 > right_fit_cr = np.polyfit(np.linspace(0, 719, num=9)\*ym_per_pix, window_centroids[:,1]\*xm_per_pix, 2)  
 > left_curverad = ((1 + (2\*left_fit_cr[0]\*y_eval\*ym_per_pix + left_fit_cr[1])\*\*2)\*\*1.5) / np.absolute(2\*left_fit_cr[0])  
 > right_curverad = ((1 + (2\*right_fit_cr[0]\*y_eval\*ym_per_pix + right_fit_cr[1])\*\*2)\*\*1.5) / np.absolute(2\*right_fit_cr[0])  
-> self.line_pos = self.current_fit[0]\*y_eval\*\*2 +self.current_fit[1]\*y_eval + self.current_fit[2]  
-> self.line_base_pos = (self.line_pos - 640)\*3.7/600.0 # 3.7 meters is about 600 pixels in the x direction  
-
+> self.line_base_pos = self.current_fit[0]*y_eval\*\*2 +self.current_fit[1]\*y_eval + self.current_fit[2]  
+> off_center_px = ((right.line_base_pos + left.line_base_pos) // 2 - 640)  
+> off_center_meters = ((right.line_base_pos + left.line_base_pos) // 2 - 640)* 3.7/ 600.0 * 100.0  
 
 #### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
@@ -152,7 +159,7 @@ Also here's other three examples.
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-Here's a [link to the result video on youtube](https://youtu.be/dHxEyRM8CBM) or [link to the local file](./output.mp4)
+Here's a [link to the local file](./output.mp4)
 
 ---
 
@@ -163,3 +170,8 @@ Here's a [link to the result video on youtube](https://youtu.be/dHxEyRM8CBM) or 
 * My pipeline sometimes fails when the curvature is high. To be specific, the displayed curvature on output video is not sanity chechekd.
 * To improve it, I need to improve my understanding about curvature, then implement sanity check.
 * I feel like I have many 'redundant' functions, especially ones to find best fits. It is because I didn't build it from the scratch but borrowed some of it from the course. 
+
+
+* Udate after review  
+- I changed src and dst points for perspective transform. Warping precisely is important because in my case left lane affects right lane too. After this modification, most of false lane detection has gone.
+- I changed distance from the center function according to the formular in the review. From my investigation, this time result is correct (hopefully.)
