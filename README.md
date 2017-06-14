@@ -90,12 +90,12 @@ My perspective transform function('def perspectivetransform(img, topdown)') is a
 
 The point for source and destination is calculated like this:
 
->    offset=[50,0]
->    corners = np.float32([[190,720],[590,450],[700,450],[1090,720]]) # bottom-left, top-left, top-right, bottom-right ([x,y])
->    new_top_left=np.array([corners[0,0],0])
->    new_top_right=np.array([corners[3,0],0])    
->    src = np.float32([corners[0], corners[1], corners[2], corners[3]])
->    dst = np.float32([corners[0] + offset, new_top_left, new_top_right, corners[3] - offset])
+>    offset=[50,0]  
+>    corners = np.float32([[190,720],[590,450],[700,450],[1090,720]]) # bottom-left, top-left, top-right, bottom-right ([x,y])  
+>    new_top_left=np.array([corners[0,0],0])  
+>    new_top_right=np.array([corners[3,0],0])  
+>    src = np.float32([corners[0], corners[1], corners[2], corners[3]])  
+>    dst = np.float32([corners[0] + offset, new_top_left, new_top_right, corners[3] - offset])  
 
 This resulted in the following source and destination points:  
 
