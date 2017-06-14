@@ -173,5 +173,5 @@ Here's a [link to the local file](./output.mp4)
 
 
 * Udate after review  
-- I changed src and dst points for perspective transform. Warping precisely is important because in my case left lane affects right lane too. After this modification, most of false lane detection has gone.
-- I changed distance from the center function according to the formular in the review. From my investigation, this time result is correct (hopefully.)
+  - I changed src and dst points for perspective transform. Warping precisely is important because in my case left lane affects right lane too. After this modification, most of false lane detection has gone.
+  - I changed distance from the center function according to the formular in the review. From my investigation, this time result is correct (hopefully.)
